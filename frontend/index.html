@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>User Manager</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.container{
+width:800px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h1{
+text-align:center;
+}
+
+input{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
+
+button{
+padding:8px 15px;
+background:#3498db;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button.delete{
+background:#e74c3c;
+}
+B
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+}
+
+td,th{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+img{
+width:60px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>User CRUD Manager</h1>
+
+<h3>Tambah User</h3>
+
+<form id="formUser">
+
+<input name="name" placeholder="Nama" required>
+<br><br>
+<input name="email" placeholder="Email" required>
+<br><br>
+<input type="file" name="photo" required>
+<br><br>
+<button type="submit">Tambah User</button>
+
+</form>
+
+
+<h3>Daftar User</h3>
+
+<table>
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Nama</th>
+<th>Email</th>
+<th>Foto</th>
+<th>Aksi</th>
+</tr>
+
+</thead>
+
+<tbody id="userTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+const api = "http://192.168.1.12:8080"
+
+async function loadUsers(){
+
+    let res = await fetch(api + "/users")
+    let users = await res.json()
+
+    let html = ""
+
+    users.forEach(user => {
+
+        html += `
+        <tr>
+            <td>${user.id}</td>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td><img src="${user.photo_}" width="60"></td>
+            <td>
+                <button onclick="deleteUser(${user.id})">Delete</button>
+            </td>
+        </tr>
+        `
+
+    })
+
+    document.getElementById("userTable").innerHTML = html
+}
+
+document.getElementById("formUser").addEventListener("submit", async function(e){
+
+    e.preventDefault()
+
+    let formData = new FormData(this)
+
+    await fetch(api + "/users",{
+        method:"POST",
+        body:formData
+    })
+
+    this.reset()
+
+    loadUsers()
+
+})
+
+async function deleteUser(id){
+
+    await fetch(api + "/users/" + id,{
+        method:"DELETE"
+    })
+
+    loadUsers()
+
+}
+
+loadUsers()
+
+</script>
+</body>
+</html>
